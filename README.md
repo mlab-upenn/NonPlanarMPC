@@ -3,8 +3,8 @@
 Quick notes on how to set up the environment, launch the simulator, and extend it with custom tracks.
 
 ## Maps Package
-- Premade tracks live in the shared archive on [drive](https://drive.google.com/file/d/1UB569kuXtFDBQgYuY2cueMN8XaaIgi8i/view?usp=sharing). 
-  Download and unzip the file in the repository's folder so each bundle sits under `maps/` (e.g., `maps/l_track/l_track.usd`).
+- Premade tracks live in the shared archive on [drive](https://drive.google.com/drive/folders/1cGoTcyIYJRX1yKAAreRcOjuLXjiluoT0?usp=sharing). 
+  Select all, download, and unzip the files in the `maps/` folder so each bundle sits under `maps/` (e.g., `maps/l_track/l_track.usd`).
 
 ## Setup & Launch
 0. **Clone the repository and install uv:**
