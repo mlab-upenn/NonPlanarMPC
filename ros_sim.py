@@ -41,7 +41,7 @@ USD_EXTENSIONS = {".usd", ".usda", ".usdc", ".usdz"}
 MESH_EXTENSIONS = {".obj", ".ply"}
 CONVERTED_MAP_DIR = Path(__file__).resolve().parent / ".converted_maps"
 
-MAP_IDX = 2  # change to select different map
+MAP_IDX = 1  # change to select different map
 CURR_DIR = Path(__file__).resolve().parent
 AVAILABLE_MAPS = [
     None,
