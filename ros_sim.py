@@ -42,21 +42,20 @@ MESH_EXTENSIONS = {".obj", ".ply"}
 CONVERTED_MAP_DIR = Path(__file__).resolve().parent / ".converted_maps"
 
 MAP_IDX = 2  # change to select different map
+CURR_DIR = Path(__file__).resolve().parent
 AVAILABLE_MAPS = [
     None,
-    "/home/ahmad/isaacsim/environments/nonPlanarSim/maps/motorcross/motorcross_track_demo.usd",
-    "/home/ahmad/isaacsim/environments/nonPlanarSim/maps/l_track/l_track.usd",
-    "/home/ahmad/isaacsim/environments/nonPlanarSim/maps/oval/oval.usd",
-    "/home/ahmad/isaacsim/environments/nonPlanarSim/maps/kidney/kidney.usd",
+    CURR_DIR / "maps/l_track/l_track.usd",
+    CURR_DIR / "maps/oval/oval.usd",
+    CURR_DIR / "maps/kidney/kidney.usd",
 ]
 INITIAL_POSITION_PER_MAP = [
     Gf.Vec3d(0.0, 0.0, 0.0),            # default ground plane
-    Gf.Vec3d(0.0, 0.0, 45.7),          # motorcross track
     Gf.Vec3d(0.0, 0.0, 0.5),          # l_track track
     Gf.Vec3d(0.0, 0.0, 0.5),          # oval track
     Gf.Vec3d(0.0, 0.0, 0.5),          # kidney track
 ]
-CHOSEN_MAP = AVAILABLE_MAPS[MAP_IDX]
+CHOSEN_MAP = str(AVAILABLE_MAPS[MAP_IDX]) if AVAILABLE_MAPS[MAP_IDX] else None
 INITIAL_POSITION = INITIAL_POSITION_PER_MAP[MAP_IDX]
 
 LEATHERBACK_RIG_PATH = "/World/LeatherbackRig"
