@@ -34,26 +34,26 @@ ODOM_TOPIC = "/fixposition/odometry"
 GT_STATE_TOPIC = "/ground_truth/state"
 MAP_FRAME_ID = "map"
 BASE_FRAME_ID = "base_link"
-STEER_RATE_LIMIT_RAD = math.radians(180.0)
+STEER_RATE_LIMIT_RAD = math.radians(360.0)
 EPS = 1e-6
 
 USD_EXTENSIONS = {".usd", ".usda", ".usdc", ".usdz"}
 MESH_EXTENSIONS = {".obj", ".ply"}
 CONVERTED_MAP_DIR = Path(__file__).resolve().parent / ".converted_maps"
 
-MAP_IDX = 0 # change to select different map
+MAP_IDX = 2 # change to select different map
 CURR_DIR = Path(__file__).resolve().parent
 AVAILABLE_MAPS = [
     None,
     CURR_DIR / "maps/l_track/l_track.usd",
     CURR_DIR / "maps/oval/oval.usd",
-    CURR_DIR / "maps/kidney/kidney.usd",
+    # CURR_DIR / "maps/kidney/kidney.usd",
 ]
 INITIAL_POSITION_PER_MAP = [
     Gf.Vec3d(0.0, 0.0, 0.0),            # default ground plane
     Gf.Vec3d(0.0, 0.0, 0.5),          # l_track track
-    Gf.Vec3d(0.0, 0.0, 0.5),          # oval track
-    Gf.Vec3d(0.0, 0.0, 0.5),          # kidney track
+    Gf.Vec3d(0.0, 18.5, 1.1),          # oval track
+    # Gf.Vec3d(0.0, 18.5, 1.1),          # kidney track
 ]
 CHOSEN_MAP = str(AVAILABLE_MAPS[MAP_IDX]) if AVAILABLE_MAPS[MAP_IDX] else None
 INITIAL_POSITION = INITIAL_POSITION_PER_MAP[MAP_IDX]
@@ -212,9 +212,19 @@ class CommandState:
 
 def make_ros_thread(cmd: CommandState, wheel_base_m: float, max_steer_rad: float):
     def twist_to_ackermann(twist: Twist):
-        v = float(twist.linear.x)
-        theta = math.radians(float(twist.angular.z))
-        return v, max(-max_steer_rad, min(max_steer_rad, theta))
+        v = twist.linear.x
+        omega = twist.angular.z
+        if omega == 0 or v == 0:
+            if omega != 0:
+                print(
+                    f'Invalid command for ackermann drive with zero vel {v} but non zero '
+                    f'omega {omega}')
+            return v, 0.0
+
+        turning_radius = v / omega
+        steering_angle = math.atan(wheel_base_m / turning_radius)
+        steering_angle = clamp(steering_angle, -max_steer_rad, max_steer_rad)
+        return v, steering_angle
 
     def spin():
         rclpy.init()
@@ -282,7 +292,7 @@ def make_ros_thread(cmd: CommandState, wheel_base_m: float, max_steer_rad: float
         node.create_subscription(AckermannDriveStamped, "ackermann_cmd", ack_cb, qos)
         node.create_subscription(AckermannDriveStamped, "/drive", drive_cb, qos)
         node.create_subscription(Twist, "cmd_vel", twist_cb, qos)
-        node.create_timer(1.0 / 60.0, publish_state)
+        node.create_timer(1.0 / 600.0, publish_state)
         rclpy.spin(node)
         node.destroy_node()
         rclpy.shutdown()
@@ -404,7 +414,7 @@ while simulation_app.is_running():
     wheel_omega = speed_mps / max(S.WHEEL_R, 1e-6)
 
     # Ackermann: [steer, steer_vel, forward_wheel_omega, accel, dt]
-    actions = S.controller.forward([S.delta, 0.0, wheel_omega, 0.0, dt])
+    actions = S.controller.forward([steer_target, 3.2*10.0, wheel_omega, 30.0, dt])
 
     joint_pos = np.zeros(S.robot.num_dof)
     joint_vel = np.zeros(S.robot.num_dof)
