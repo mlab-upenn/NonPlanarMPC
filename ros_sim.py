@@ -55,8 +55,17 @@ INITIAL_POSITION_PER_MAP = [
     Gf.Vec3d(0.0, 18.5, 1.1),          # oval track
     # Gf.Vec3d(0.0, 18.5, 1.1),          # kidney track
 ]
+# Euler angles in degrees (roll, pitch, yaw)
+INITIAL_ORIENTATION_PER_MAP = [
+    Gf.Vec3f(0.0, 0.0, 0.0),
+    Gf.Vec3f(0.0, 0.0, 0.0),
+    Gf.Vec3f(0.0, 0.0, 0.0),
+    # Gf.Vec3f(0.0, 0.0, 0.0),
+]
+
 CHOSEN_MAP = str(AVAILABLE_MAPS[MAP_IDX]) if AVAILABLE_MAPS[MAP_IDX] else None
 INITIAL_POSITION = INITIAL_POSITION_PER_MAP[MAP_IDX]
+INITIAL_ORIENTATION = INITIAL_ORIENTATION_PER_MAP[MAP_IDX]
 
 LEATHERBACK_RIG_PATH = "/World/LeatherbackRig"
 LEATHERBACK_ROBOT_PATH = f"{LEATHERBACK_RIG_PATH}/Robot"
@@ -339,10 +348,15 @@ async def setup():
     xf = UsdGeom.XformCommonAPI(rig_prim)
     xf.SetScale(RIG_SCALE)
     xf.SetTranslate(INITIAL_POSITION)
+    xf.SetRotate(Gf.Vec3f(
+        INITIAL_ORIENTATION[0],
+        INITIAL_ORIENTATION[1],
+        INITIAL_ORIENTATION[2],
+    ), UsdGeom.XformCommonAPI.RotationOrderXYZ)
 
     # Register Robot wrapper at the referenced prim
     S.robot = S.world.scene.add(Robot(prim_path=LEATHERBACK_ROBOT_PATH, name="leatherback"))
-    print(f"[spawn] Leatherback rig scaled to {tuple(RIG_SCALE)} at translate {tuple(INITIAL_POSITION)}")
+    print(f"[spawn] Leatherback rig scaled to {tuple(RIG_SCALE)} at translate {tuple(INITIAL_POSITION)} with orientation {tuple(INITIAL_ORIENTATION)}")
 
     await S.world.reset_async()
     await S.world.play_async()
