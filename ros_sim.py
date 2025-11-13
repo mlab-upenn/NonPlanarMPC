@@ -41,7 +41,7 @@ USD_EXTENSIONS = {".usd", ".usda", ".usdc", ".usdz"}
 MESH_EXTENSIONS = {".obj", ".ply"}
 CONVERTED_MAP_DIR = Path(__file__).resolve().parent / ".converted_maps"
 
-MAP_IDX = 2  # change to select different map
+MAP_IDX = 0 # change to select different map
 CURR_DIR = Path(__file__).resolve().parent
 AVAILABLE_MAPS = [
     None,
@@ -404,7 +404,7 @@ while simulation_app.is_running():
     wheel_omega = speed_mps / max(S.WHEEL_R, 1e-6)
 
     # Ackermann: [steer, steer_vel, forward_wheel_omega, accel, dt]
-    actions = S.controller.forward([S.delta, S.delta_rate, wheel_omega, 0.0, dt])
+    actions = S.controller.forward([S.delta, 0.0, wheel_omega, 0.0, dt])
 
     joint_pos = np.zeros(S.robot.num_dof)
     joint_vel = np.zeros(S.robot.num_dof)
