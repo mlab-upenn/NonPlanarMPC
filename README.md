@@ -1,40 +1,58 @@
-# NonPlanarIsaacSim
+# NonPlanarMPC
 
-Quick notes on how to set up the environment, launch the simulator, and extend it with custom tracks.
+Reference controller for **Nonplanar Model Predictive Control for Autonomous
+Vehicles with Recursive Sparse Gaussian Process Dynamics** (Amine, Puri, Le,
+Mangharam — IEEE Intelligent Vehicles Symposium, 2026).
 
-## Maps Package
-- Premade tracks live in the shared archive on [drive](https://drive.google.com/drive/folders/1cGoTcyIYJRX1yKAAreRcOjuLXjiluoT0?usp=sharing). 
-  Select all, download, and unzip the files in the `maps/` folder so each bundle sits under `maps/` (e.g., `maps/l_track/l_track.usd`).
+The method is a sampling-based **MPPI** controller on a single-track dynamic
+bicycle model, augmented with an online-learned **recursive sparse Gaussian-process
+residual** that compensates for nonplanar terrain (slopes, banks, hills).
 
-## Setup & Launch
-0. **Clone the repository and install uv:**
-   ```bash
-   git clone git@github.com:AhmadAmine998/NonPlanarIsaacSim.git
-   pip install uv
-   ```
-   You will need [`uv`](https://docs.astral.sh/uv/getting-started/installation/) to install and run the simulator.
-1. **Install dependencies (one-time):**
-   ```bash
-   bash install_env.sh
-   ```
-2. **Load the environment for every new shell before running the sim:**
-   ```bash
-   source setup_env.sh
-   ```
-3. **Start the ROS-enabled Isaac sim:**
-   ```bash
-   uv run python ros_sim.py
-   ```
-   The script picks the map referenced by `MAP_IDX` in `ros_sim.py` and will open the simulator GUI once the assets load.
+> [!IMPORTANT]
+> **The controller implementation is being finalized (cleanup) and will be released here
+> shortly.** For early access or questions in the meantime, please contact
+> **Ahmad Amine** (aminea at upenn.edu).
 
-## Driving the Car
-- Run keyboard teleop with `ros2 run teleop_twist_keyboard teleop_twist_keyboard`, which publishes `geometry_msgs/Twist` on `cmd_vel`.
-- Any higher-level controller should publish `AckermannDriveStamped` to either `ackermann_cmd` or `/drive` to command speed/steering directly, or publish `Twist` on `cmd_vel`.
-- The node republishes odometry on `/fixposition/odometry` and ground-truth drive states on `/ground_truth/state` for downstream consumers.
+## Simulation environment
 
-## Adding New Maps
-1. Place each new asset in its own subfolder inside `maps/` (e.g., `maps/new_map/new_map.usd` plus any textures or dependencies) to keep things organized.
-2. Supported formats are `.usd`, `.usda`, `.usdz`, `.usdc`, `.obj`, and `.ply`. Meshes are auto-converted to USD on first use and cached in `.converted_maps/`.
-3. Add the new file path to `AVAILABLE_MAPS` in `ros_sim.py`, set `MAP_IDX` to point to it, and update `INITIAL_POSITION_PER_MAP` so the rig spawns above the correct location/scale.
+The custom NVIDIA Isaac Sim environment originally developed for this project is
+**deprecated**. The simulation project evolved into the open-source
+**[Autoware off-road sim](https://github.com/autowarefoundation/autoware_off-road_sim)**,
+included here as a submodule under [`third_party/`](third_party/). It ships the
+nonplanar tracks used in the paper (L-shaped, kidney, oval) and a RoboRacer
+vehicle with a ROS 2 interface. All credits for the sim go to the original authors of the Autoware off-road sim. The NonPlanarMPC controller is compatible with the sim and can be run on the tracks with the launch configurations in [`sim_configs/`](sim_configs/).
 
-That is all that is required; just remember to re-run `source setup_env.sh` in any new terminal before launching the simulator.
+## Repository layout
+
+| Path | Contents |
+|---|---|
+| [`third_party/autoware_off-road_sim/`](third_party/) | Simulation environment - submodule |
+| [`third_party/f1tenth_planning/`](third_party/) | Motion-planning library the controller builds on - submodule |
+| [`sim_configs/`](sim_configs/) | Off-road sim launch configs - *coming soon* |
+| [`tracks/`](tracks/) | Per-track raceline + terrain data - *coming soon* |
+| [`scripts/`](scripts/) | Run / training / extraction entry points - *coming soon* |
+| [`docs/`](docs/) | Project website - *coming soon* |
+
+The `npmpc` controller package will be added at the top level when released.
+
+## Submodules
+
+```bash
+git clone --recurse-submodules https://github.com/mlab-upenn/NonPlanarMPC.git
+# or, after a plain clone:
+git submodule update --init --recursive
+```
+
+## Citation
+
+```bibtex
+@misc{amine2026nonplanarmodelpredictivecontrol,
+      title={Nonplanar Model Predictive Control for Autonomous Vehicles with Recursive Sparse Gaussian Process Dynamics}, 
+      author={Ahmad Amine and Kabir Puri and Viet-Anh Le and Rahul Mangharam},
+      year={2026},
+      eprint={2602.16206},
+      archivePrefix={arXiv},
+      primaryClass={cs.RO},
+      url={https://arxiv.org/abs/2602.16206}, 
+}
+```

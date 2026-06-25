@@ -1,0 +1,7 @@
+[submodule "third_party/f1tenth_planning"]
+	path = third_party/f1tenth_planning
+	url = https://github.com/f1tenth/f1tenth_planning
+	branch = dev-cleanup
+[submodule "third_party/autoware_off-road_sim"]
+	path = third_party/autoware_off-road_sim
+	url = https://github.com/autowarefoundation/autoware_off-road_sim
